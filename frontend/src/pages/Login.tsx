@@ -11,6 +11,7 @@ import {
   GitBranch,
 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
+import ReportHubLogo from "../assets/ReportHub_logo.png";
 
 function Login() {
   const navigate = useNavigate();
@@ -55,10 +56,10 @@ function Login() {
       <div className="relative z-10 flex h-full flex-col px-4 pb-4 pt-0 md:px-8 md:pt-6">
         <header className="flex flex-col items-center text-center text-white">
           <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded bg-white text-[#3a3fb8] shadow-[0_4px_10px_rgba(0,0,0,0.08)]">
-              <BarChart3 className="h-5 w-5" />
+            <div className="flex h-10 w-10 items-center justify-center rounded bg-white text-[#3a3fb8] shadow-[0_4px_10px_rgba(0,0,0,0.08)]">
+              <img src={ReportHubLogo} alt="ReportHub Logo" className="h-10 w-auto" />
             </div>
-            <h1 className="text-[2.3rem] font-extrabold tracking-[-0.05em] md:text-[2.45rem]">
+            <h1 className="text-xl font-extrabold tracking-[-0.05em]">
               ReportHub.
             </h1>
           </div>
@@ -68,7 +69,7 @@ function Login() {
         </header>
 
         <main className="flex flex-1 min-h-0 items-center justify-center py-2 md:py-3">
-          <section className="w-full max-w-[365px] rounded-[29px] bg-white px-7 py-5 shadow-[0_18px_45px_rgba(40,45,120,0.16)] md:px-8 md:py-6">
+          <section className="w-full max-w-[365px] rounded-[29px] bg-white px-7 py-5 shadow-[0_18px_45px_rgba(40,45,120,0.16)] md:px-8 md:py-6 border border-slate-100">
             <div className="text-center">
               <h2 className="text-[1.98rem] font-extrabold tracking-[-0.04em] text-[#20222a]">
                 Welcome Back

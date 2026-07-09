@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   User,
   Mail,
@@ -7,26 +7,29 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
-  BarChart3,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import ReportHubLogo from "../assets/ReportHub_logo.png";
 
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<"member" | "manager">("member");
 
   return (
-    <div className="min-h-screen w-full bg-slate-50 flex items-center justify-center p-4 antialiased font-sans">
+    <div className="relative h-screen w-full overflow-hidden flex items-center justify-center p-4 antialiased font-sans">
+      <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-[#3d40c0] via-[#363bb8] to-[#3237b1]" />
+      <div className="absolute inset-x-0 top-1/2 bottom-0 bg-[#efeff6]" />
+
       {/* Main Card Container */}
-      <div className="w-full max-w-[1000px] bg-white rounded-[32px] shadow-xl shadow-slate-200/80 flex flex-col md:flex-row overflow-hidden border border-slate-100">
+      <div className="relative z-10 w-full max-w-[1000px] bg-white rounded-[32px] flex flex-col md:flex-row overflow-hidden border border-slate-100">
         {/* Left Side: Brand / Marketing Panel */}
         <div className="w-full md:w-[42%] bg-[#2e3bb1] p-8 md:p-12 flex flex-col justify-between text-white relative min-h-[400px] md:min-h-[620px]">
           {/* Top: Logo */}
           <div className="flex items-center gap-2">
             <div className="bg-white/15 p-2 rounded-xl backdrop-blur-sm">
-              <BarChart3 className="w-5 h-5 text-white" />
+              <img src={ReportHubLogo} alt="ReportHub Logo" className="h-15 w-auto" />
             </div>
-            <span className="font-bold text-xl tracking-tight">ReportHub</span>
+            <span className="font-bold text-2xl tracking-tight">ReportHub</span>
           </div>
 
           {/* Middle: Value Proposition */}
@@ -158,7 +161,7 @@ export default function Register() {
                   <button
                     type="button"
                     onClick={() => setRole("member")}
-                    className={`flex-1 py-2.5 text-xs font-medium rounded-lg transition-all ${
+                    className={`flex-1 py-2.5 text-xs font-medium rounded-lg transition-all cursor-pointer ${
                       role === "member"
                         ? "bg-[#f05a28] text-white shadow-sm"
                         : "text-slate-600 hover:text-slate-900"
@@ -169,7 +172,7 @@ export default function Register() {
                   <button
                     type="button"
                     onClick={() => setRole("manager")}
-                    className={`flex-1 py-2.5 text-xs font-medium rounded-lg transition-all ${
+                    className={`flex-1 py-2.5 text-xs font-medium rounded-lg cursor-pointer transition-all ${
                       role === "manager"
                         ? "bg-[#f05a28] text-white shadow-sm"
                         : "text-slate-600 hover:text-slate-900"
