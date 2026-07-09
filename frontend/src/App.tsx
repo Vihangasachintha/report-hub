@@ -2,6 +2,8 @@ import './App.css';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import MyReports from './pages/MyReports';
 
 function App() {
   return (
@@ -16,6 +18,10 @@ function App() {
         <Route path="/register" element={<Register />} />
 
         {/* Dashboard page */}
+        <Route path="/dashboard" element={<Dashboard />} />
+
+        {/* MyReports page */}
+        <Route path="/my-reports" element={<MyReports />} />
       </Routes>
 
   );
