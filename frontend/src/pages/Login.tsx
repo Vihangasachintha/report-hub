@@ -10,7 +10,7 @@ import {
   Sparkles,
   GitBranch,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Login() {
   const navigate = useNavigate();
@@ -146,15 +146,17 @@ function Login() {
             <div className="my-3 border-t border-[#f1d9d1]" />
 
             <div className="text-center">
-              <button
-                type="button"
-                className="border-0 bg-transparent p-0 text-[0.98rem] font-bold text-[#f15a20]"
-              >
-                Register Now
-              </button>
               <p className="mt-1 text-[0.88rem] text-[#61504b]">
                 Don't have an account yet?
               </p>
+              <Link to="/register">
+                <button
+                  type="button"
+                  className="border-0 bg-transparent p-0 text-[0.98rem] font-bold text-[#f15a20] cursor-pointer"
+                >
+                  Register here
+                </button>
+              </Link>
             </div>
           </section>
         </main>
