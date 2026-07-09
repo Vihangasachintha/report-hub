@@ -1,7 +1,7 @@
 import { useState } from "react";
+import type { FormEvent } from "react";
 import {
   ArrowRight,
-  BarChart3,
   Eye,
   EyeOff,
   Lock,
@@ -12,22 +12,31 @@ import {
 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import ReportHubLogo from "../assets/ReportHub_logo.png";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
+    setError("");
+    setIsSubmitting(true);
 
-    // TODO: call backend login API here
-    console.log({ email, password });
-
-    // temporary navigation after login
-    navigate("/dashboard");
+    try {
+      const user = await login(email, password);
+      navigate(user.role === "manager" ? "/dashboard" : "/my-reports");
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Invalid email or password");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -91,6 +100,7 @@ function Login() {
                     placeholder="name@company.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    required
                     className="h-full w-full min-w-0 bg-transparent text-[0.95rem] text-[#5f6677] outline-none placeholder:text-[#9098ad]"
                   />
                 </div>
@@ -116,13 +126,12 @@ function Login() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    required
                     className="h-full w-full min-w-0 bg-transparent text-[0.95rem] text-[#5f6677] outline-none placeholder:text-[#9098ad]"
                   />
                   <button
                     type="button"
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                     onClick={() => setShowPassword((prev) => !prev)}
                     className="ml-2 inline-flex shrink-0 items-center justify-center border-0 bg-transparent p-0 text-[#6f584f]"
                   >
@@ -135,11 +144,18 @@ function Login() {
                 </div>
               </div>
 
+              {error && (
+                <p className="text-center text-sm font-medium text-red-500">
+                  {error}
+                </p>
+              )}
+
               <button
                 type="submit"
-                className="mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#f9632a] text-[1.02rem] font-semibold text-white shadow-[0_12px_22px_rgba(249,99,42,0.38)] transition duration-200 hover:-translate-y-px hover:bg-[#ef5a21] hover:shadow-[0_14px_26px_rgba(249,99,42,0.45)]"
+                disabled={isSubmitting}
+                className="mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#f9632a] text-[1.02rem] font-semibold text-white shadow-[0_12px_22px_rgba(249,99,42,0.38)] transition duration-200 hover:-translate-y-px hover:bg-[#ef5a21] hover:shadow-[0_14px_26px_rgba(249,99,42,0.45)] disabled:opacity-60 disabled:hover:translate-y-0"
               >
-                <span>Login to Workspace</span>
+                <span>{isSubmitting ? "Logging in..." : "Login to Workspace"}</span>
                 <ArrowRight className="h-5 w-5" />
               </button>
             </form>
