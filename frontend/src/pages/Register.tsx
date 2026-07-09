@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { FormEvent } from "react";
 import {
   User,
   Mail,
@@ -8,23 +9,61 @@ import {
   EyeOff,
   ArrowRight,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import ReportHubLogo from "../assets/ReportHub_logo.png";
+import { useAuth } from "../context/AuthContext";
 
 export default function Register() {
+  const navigate = useNavigate();
+  const { register } = useAuth();
+
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<"member" | "manager">("member");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleRegister = async (e: FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    if (password !== passwordConfirmation) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const user = await register({
+        name,
+        email,
+        password,
+        password_confirmation: passwordConfirmation,
+        role,
+      });
+      navigate("/login");
+    } catch (err: any) {
+      const errors = err.response?.data?.errors;
+      setError(
+        errors
+          ? (Object.values(errors).flat() as string[]).join(" ")
+          : "Registration failed. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="relative h-screen w-full overflow-hidden flex items-center justify-center p-4 antialiased font-sans">
       <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-[#3d40c0] via-[#363bb8] to-[#3237b1]" />
       <div className="absolute inset-x-0 top-1/2 bottom-0 bg-[#efeff6]" />
 
-      {/* Main Card Container */}
       <div className="relative z-10 w-full max-w-[1000px] bg-white rounded-[32px] flex flex-col md:flex-row overflow-hidden border border-slate-100">
-        {/* Left Side: Brand / Marketing Panel */}
         <div className="w-full md:w-[42%] bg-[#2e3bb1] p-8 md:p-12 flex flex-col justify-between text-white relative min-h-[400px] md:min-h-[620px]">
-          {/* Top: Logo */}
           <div className="flex items-center gap-2">
             <div className="bg-white/15 p-2 rounded-xl backdrop-blur-sm">
               <img src={ReportHubLogo} alt="ReportHub Logo" className="h-15 w-auto" />
@@ -32,7 +71,6 @@ export default function Register() {
             <span className="font-bold text-2xl tracking-tight">ReportHub</span>
           </div>
 
-          {/* Middle: Value Proposition */}
           <div className="my-auto py-8">
             <h1 className="text-3xl md:text-4xl font-bold leading-tight mb-4 tracking-tight">
               Master your weekly data flow.
@@ -43,7 +81,6 @@ export default function Register() {
             </p>
           </div>
 
-          {/* Bottom: Floating Feature Highlights Card */}
           <div className="bg-white/10 border border-white/10 rounded-2xl p-5 backdrop-blur-md shadow-inner">
             <h3 className="font-semibold text-sm mb-1 text-white">
               Weekly Report Dashboard
@@ -52,24 +89,11 @@ export default function Register() {
               Track team progress, submissions, blockers, and workload in one
               place.
             </p>
-            <div className="space-y-1.5">
-              <p className="text-[11px] text-white/50 uppercase tracking-wider font-semibold">
-                Why this is good:
-              </p>
-              <ul className="text-xs text-white/80 space-y-1 list-disc list-inside font-light">
-                <li>matches the assignment exactly</li>
-                <li>sounds product-like</li>
-                <li>works for manager dashboard</li>
-                <li>no fake feature</li>
-              </ul>
-            </div>
           </div>
         </div>
 
-        {/* Right Side: Registration Form */}
         <div className="w-full md:w-[58%] p-8 md:p-12 flex flex-col justify-center">
           <div className="max-w-[440px] w-full mx-auto">
-            {/* Header */}
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
               Create Your Account
             </h2>
@@ -77,8 +101,7 @@ export default function Register() {
               Start generating beautiful reports in seconds.
             </p>
 
-            <form onSubmit={(e) => e.preventDefault()} className="space-y-5">
-              {/* Full Name */}
+            <form onSubmit={handleRegister} className="space-y-5">
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Full Name
@@ -88,12 +111,14 @@ export default function Register() {
                   <input
                     type="text"
                     placeholder="John Doe"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
                     className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#2e3bb1] focus:ring-2 focus:ring-[#2e3bb1]/10 text-slate-800 placeholder-slate-400 transition-all"
                   />
                 </div>
               </div>
 
-              {/* Email Address */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Email Address
@@ -103,14 +128,15 @@ export default function Register() {
                   <input
                     type="email"
                     placeholder="john@company.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
                     className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#2e3bb1] focus:ring-2 focus:ring-[#2e3bb1]/10 text-slate-800 placeholder-slate-400 transition-all"
                   />
                 </div>
               </div>
 
-              {/* Password Controls (Grid for Password + Confirm) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {/* Password */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                     Password
@@ -120,6 +146,10 @@ export default function Register() {
                     <input
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      minLength={6}
                       className="w-full pl-10 pr-10 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#2e3bb1] focus:ring-2 focus:ring-[#2e3bb1]/10 text-slate-800 placeholder-slate-400 transition-all"
                     />
                     <button
@@ -136,7 +166,6 @@ export default function Register() {
                   </div>
                 </div>
 
-                {/* Confirm Password */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                     Confirm
@@ -146,13 +175,15 @@ export default function Register() {
                     <input
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
+                      value={passwordConfirmation}
+                      onChange={(e) => setPasswordConfirmation(e.target.value)}
+                      required
                       className="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-[#2e3bb1] focus:ring-2 focus:ring-[#2e3bb1]/10 text-slate-800 placeholder-slate-400 transition-all"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Account Role Segmented Control */}
               <div>
                 <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Account Role
@@ -188,26 +219,31 @@ export default function Register() {
                 </p>
               </div>
 
-              {/* Submit Button */}
+              {error && (
+                <p className="text-center text-sm font-medium text-red-500">
+                  {error}
+                </p>
+              )}
+
               <button
                 type="submit"
-                className="w-full bg-[#f05a28] hover:bg-[#e04f1e] active:scale-[0.99] text-white font-medium text-sm py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-orange-600/20 transition-all mt-6"
+                disabled={isSubmitting}
+                className="w-full bg-[#f05a28] hover:bg-[#e04f1e] active:scale-[0.99] text-white font-medium text-sm py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-orange-600/20 transition-all mt-6 disabled:opacity-60 disabled:active:scale-100"
               >
-                <span>Create Account</span>
+                <span>{isSubmitting ? "Creating account..." : "Create Account"}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
-              {/* Login Redirection */}
               <div className="text-center">
                 <p className="mt-1 text-[0.88rem] text-[#61504b]">
-                  Don't have an account yet?
+                  Already have an account?
                 </p>
                 <Link to="/login">
                   <button
                     type="button"
                     className="border-0 bg-transparent p-0 text-[0.98rem] font-bold text-[#f15a20] cursor-pointer"
                   >
-                    Login
+                    Login Here
                   </button>
                 </Link>
               </div>
