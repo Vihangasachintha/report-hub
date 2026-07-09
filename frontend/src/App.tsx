@@ -4,6 +4,9 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import MyReports from './pages/MyReports';
+import ProtectedRoute from "./components/ProtectedRoute";
+import Layout from './components/Layout';
+import Projects from './pages/Projects';
 
 function App() {
   return (
@@ -17,11 +20,13 @@ function App() {
         {/* Register page */}
         <Route path="/register" element={<Register />} />
 
-        {/* Dashboard page */}
-        <Route path="/dashboard" element={<Dashboard />} />
-
-        {/* MyReports page */}
-        <Route path="/my-reports" element={<MyReports />} />
+        <Route element={<ProtectedRoute />}>
+        <Route element={<Layout />}>
+          <Route path="/my-reports" element={<MyReports />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/projects" element={<Projects />} />
+        </Route>
+      </Route>
       </Routes>
 
   );

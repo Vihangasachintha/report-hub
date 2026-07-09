@@ -1,4 +1,3 @@
-import React from 'react';
 import { 
   LayoutDashboard, 
   FileText, 
@@ -18,12 +17,6 @@ import {
 } from 'lucide-react';
 
 export default function MyReports() {
-  const navItems = [
-    { name: 'Dashboard', icon: LayoutDashboard, active: false },
-    { name: 'My Reports', icon: FileText, active: true },
-    { name: 'Projects', icon: FolderKanban, active: false },
-    { name: 'Team Reports', icon: Users, active: false },
-  ];
 
   const statCards = [
     { title: 'SUBMITTED', value: '24', type: 'chart' },
@@ -69,45 +62,6 @@ export default function MyReports() {
 
   return (
     <div className="flex min-h-screen bg-[#f8fafc] font-sans text-slate-800 antialiased">
-      
-      {/* 1. SIDEBAR */}
-      <aside className="w-64 bg-white border-r border-slate-100 flex flex-col justify-between p-6 shrink-0">
-        <div>
-          {/* Logo */}
-          <div className="mb-10 pl-2">
-            <span className="font-bold text-lg tracking-tight text-indigo-900">ReportGen.</span>
-            <p className="text-[11px] text-slate-400 font-medium -mt-0.5">Weekly Analytics</p>
-          </div>
-
-          {/* Navigation Menu */}
-          <nav className="space-y-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.name}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all ${
-                    item.active
-                      ? 'bg-orange-50 text-orange-800 font-semibold'
-                      : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
-                  }`}
-                >
-                  <Icon className={`w-4 h-4 ${item.active ? 'text-orange-600' : 'text-slate-400'}`} />
-                  {item.name}
-                </button>
-              );
-            })}
-          </nav>
-        </div>
-
-        {/* Bottom Actions */}
-        <div className="pt-6 border-t border-slate-100">
-          <button className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-50 rounded-xl transition-all">
-            <LogOut className="w-4 h-4 text-slate-400" />
-            <span>Logout</span>
-          </button>
-        </div>
-      </aside>
 
       {/* 2. MAIN CONTENT AREA */}
       <div className="flex-1 flex flex-col">
@@ -140,12 +94,12 @@ export default function MyReports() {
         </header>
 
         {/* Workspace Elements */}
-        <main className="px-10 pb-10 space-y-6 overflow-y-auto max-w-[1240px] w-full">
+        <main className="px-10 pb-10 space-y-6 overflow-y-auto max-w-310 w-full">
           
           {/* High Level Stats Grid Overview */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {statCards.map((card, idx) => (
-              <div key={idx} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between min-h-[120px]">
+              <div key={idx} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between min-h-30">
                 <div>
                   <p className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">{card.title}</p>
                   <p className="text-3xl font-bold text-slate-800 tracking-tight mt-1">{card.value}</p>
@@ -173,9 +127,9 @@ export default function MyReports() {
             ))}
 
             {/* Quick Action Button Box Component */}
-            <button className="bg-orange-500 hover:bg-orange-600 active:scale-[0.99] rounded-2xl flex flex-col items-center justify-center text-white font-medium p-6 shadow-lg shadow-orange-500/10 transition-all min-h-[120px]">
+            <button className="bg-orange-500 hover:bg-orange-600 active:scale-[0.99] rounded-2xl flex flex-col items-center justify-center text-white font-medium p-6 shadow-lg shadow-orange-500/10 transition-all min-h-30">
               <div className="bg-white/20 p-2 rounded-xl mb-2">
-                <Plus className="w-4 h-4 stroke-[3]" />
+                <Plus className="w-4 h-4 stroke-3" />
               </div>
               <span className="text-xs font-semibold tracking-wide">Create New Report</span>
             </button>
