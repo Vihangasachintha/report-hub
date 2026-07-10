@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ProjectController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\UserController;
 
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:5,1'); // 5 attempts/minute
@@ -37,4 +38,10 @@ Route::middleware(['auth:api', 'role:manager'])->prefix('dashboard')->group(func
     Route::get('/trend', [DashboardController::class, 'trend']);
     Route::get('/workload-by-project', [DashboardController::class, 'workloadByProject']);
     Route::get('/recent-activity', [DashboardController::class, 'recentActivity']);
+});
+
+Route::middleware(['auth:api', 'role:manager'])->group(function () {
+    Route::get('/team-members', [UserController::class, 'members']);
+    Route::get('/projects/{project}/members', [ProjectController::class, 'members']);
+    Route::post('/projects/{project}/members', [ProjectController::class, 'syncMembers']);
 });

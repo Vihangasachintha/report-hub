@@ -73,4 +73,25 @@ class ProjectController extends Controller
 
         return response()->json(['message' => 'Project deleted successfully']);
     }
+
+    public function members(Project $project)
+    {
+        return response()->json($project->members()->get(['users.id', 'users.name', 'users.email']));
+    }
+
+    public function syncMembers(Request $request, Project $project)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_ids' => 'nullable|array',
+            'user_ids.*' => 'exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $project->members()->sync($request->user_ids ?? []);
+
+        return response()->json($project->load('members'));
+    }
 }

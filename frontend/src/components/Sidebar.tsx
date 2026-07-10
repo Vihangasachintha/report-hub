@@ -17,8 +17,7 @@ interface NavItem {
 const managerNavItems: NavItem[] = [
   { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { name: "Projects", icon: FolderKanban, path: "/projects" },
-  { name: "Team Reports", icon: Users, path: "/dashboard/reports" },
-  { name: "My Reports", icon: FileText, path: "/my-reports" },
+  { name: "Team Reports", icon: FileText, path: "/my-reports" },
 ];
 
 const memberNavItems: NavItem[] = [

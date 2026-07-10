@@ -77,3 +77,24 @@ export interface PaginatedReports {
   last_page: number;
   total: number;
 }
+
+export interface TrendItem {
+  week_start: string;
+  reports_count: number;
+}
+
+export interface RecentActivityItem {
+  id: number;
+  week_start: string;
+  week_end: string;
+  status: ReportStatus;
+  submitted_at: string | null;
+  user: { id: number; name: string };
+  project: { id: number; name: string } | null;
+}
+
+export interface TeamMember {
+  id: number;
+  name: string;
+  email: string;
+}
