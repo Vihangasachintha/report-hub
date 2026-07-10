@@ -30,6 +30,7 @@ import type {
   Project,
   TrendItem,
   RecentActivityItem,
+  TeamReport,
 } from "../types";
 
 const statusColors: Record<string, string> = {
@@ -56,6 +57,8 @@ export default function Dashboard() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [selectedReport, setSelectedReport] = useState<TeamReport | null>(null);
+
   const [weekStart, setWeekStart] = useState("");
   const [weekEnd, setWeekEnd] = useState("");
   const [userId, setUserId] = useState("");
@@ -67,9 +70,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     api.get<Project[]>("/projects").then((res) => setProjects(res.data));
-    api.get<RecentActivityItem[]>("/dashboard/recent-activity").then((res) =>
-      setActivity(res.data)
-    );
+    api
+      .get<RecentActivityItem[]>("/dashboard/recent-activity")
+      .then((res) => setActivity(res.data));
   }, []);
 
   useEffect(() => {
@@ -79,9 +82,13 @@ export default function Dashboard() {
     setLoading(true);
     Promise.all([
       api.get<DashboardSummary>("/dashboard/summary", { params }),
-      api.get<SubmissionStatusItem[]>("/dashboard/submission-status", { params }),
+      api.get<SubmissionStatusItem[]>("/dashboard/submission-status", {
+        params,
+      }),
       api.get<WorkloadItem[]>("/dashboard/workload-by-project", { params }),
-      api.get<TrendItem[]>("/dashboard/trend", { params: userId ? { user_id: userId } : {} }),
+      api.get<TrendItem[]>("/dashboard/trend", {
+        params: userId ? { user_id: userId } : {},
+      }),
     ])
       .then(([summaryRes, statusRes, workloadRes, trendRes]) => {
         setSummary(summaryRes.data);
@@ -159,15 +166,34 @@ export default function Dashboard() {
       <main className="p-8 space-y-6 overflow-y-auto max-w-300 w-full">
         {/* Summary cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard title="TEAM MEMBERS" value={summary?.total_team_members ?? "—"} icon={Users} iconBg="bg-indigo-50 text-indigo-600" />
-          <StatCard title="REPORTS SUBMITTED" value={summary?.total_reports_submitted ?? "—"} icon={FileText} iconBg="bg-orange-50 text-orange-600" />
-          <StatCard title="COMPLIANCE" value={summary ? `${summary.compliance_rate}%` : "—"} icon={LayoutDashboard} iconBg="bg-blue-50 text-blue-600" />
+          <StatCard
+            title="TEAM MEMBERS"
+            value={summary?.total_team_members ?? "—"}
+            icon={Users}
+            iconBg="bg-indigo-50 text-indigo-600"
+          />
+          <StatCard
+            title="REPORTS SUBMITTED"
+            value={summary?.total_reports_submitted ?? "—"}
+            icon={FileText}
+            iconBg="bg-orange-50 text-orange-600"
+          />
+          <StatCard
+            title="COMPLIANCE"
+            value={summary ? `${summary.compliance_rate}%` : "—"}
+            icon={LayoutDashboard}
+            iconBg="bg-blue-50 text-blue-600"
+          />
           <StatCard
             title="OPEN BLOCKERS"
             value={summary?.open_blockers_count ?? "—"}
             icon={AlertCircle}
             iconBg="bg-red-50 text-red-600"
-            badge={summary && summary.open_blockers_count > 0 ? "Needs attention" : undefined}
+            badge={
+              summary && summary.open_blockers_count > 0
+                ? "Needs attention"
+                : undefined
+            }
             badgeColor="text-red-600 bg-red-50"
           />
         </div>
@@ -178,7 +204,8 @@ export default function Dashboard() {
             Reports Submitted Over Time
           </h2>
           <p className="text-xs text-slate-400 mb-5">
-            {userId ? "Filtered to selected member" : "Team-wide"} — last 12 weeks
+            {userId ? "Filtered to selected member" : "Team-wide"} — last 12
+            weeks
           </p>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={trend}>
@@ -229,7 +256,9 @@ export default function Dashboard() {
                     key={member.user_id}
                     className="flex items-center justify-between text-xs py-1"
                   >
-                    <span className="font-medium text-slate-700">{member.name}</span>
+                    <span className="font-medium text-slate-700">
+                      {member.name}
+                    </span>
                     <span
                       className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-full ${statusColors[member.status]}`}
                     >
@@ -246,14 +275,20 @@ export default function Dashboard() {
             <h2 className="text-lg font-bold text-slate-800 tracking-tight mb-1">
               Workload by Project
             </h2>
-            <p className="text-xs text-slate-400 mb-5">Total hours logged per project</p>
+            <p className="text-xs text-slate-400 mb-5">
+              Total hours logged per project
+            </p>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={workload}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                 <XAxis dataKey="project_name" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} />
                 <Tooltip />
-                <Bar dataKey="total_hours" fill="#6366f1" radius={[6, 6, 0, 0]} />
+                <Bar
+                  dataKey="total_hours"
+                  fill="#6366f1"
+                  radius={[6, 6, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -269,7 +304,9 @@ export default function Dashboard() {
           </div>
           <div className="space-y-3">
             {activity.length === 0 && (
-              <p className="text-xs text-slate-400">No recent submissions yet.</p>
+              <p className="text-xs text-slate-400">
+                No recent submissions yet.
+              </p>
             )}
             {activity.map((item) => (
               <div
@@ -280,7 +317,9 @@ export default function Dashboard() {
                   <p className="text-sm font-semibold text-slate-800">
                     {item.user.name}
                     <span className="font-normal text-slate-400">
-                      {" "}submitted a report for {item.project?.name ?? "no project"}
+                      {" "}
+                      submitted a report for{" "}
+                      {item.project?.name ?? "no project"}
                     </span>
                   </p>
                   <p className="text-[11px] text-slate-400">
@@ -300,7 +339,9 @@ export default function Dashboard() {
         {/* Filterable team reports table */}
         <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-5">
-            <h2 className="text-lg font-bold text-slate-800 tracking-tight">Team Reports</h2>
+            <h2 className="text-lg font-bold text-slate-800 tracking-tight">
+              Team Reports
+            </h2>
             <div className="flex items-center gap-1.5 text-xs text-slate-400">
               <SlidersHorizontal className="w-3.5 h-3.5" />
               Filters
@@ -308,24 +349,65 @@ export default function Dashboard() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5">
-            <select value={userId} onChange={(e) => { setUserId(e.target.value); setPage(1); }} className="border border-slate-200 rounded-lg px-2.5 py-2 text-xs">
+            <select
+              value={userId}
+              onChange={(e) => {
+                setUserId(e.target.value);
+                setPage(1);
+              }}
+              className="border border-slate-200 rounded-lg px-2.5 py-2 text-xs"
+            >
               <option value="">All Members</option>
               {statusList.map((m) => (
-                <option key={m.user_id} value={m.user_id}>{m.name}</option>
+                <option key={m.user_id} value={m.user_id}>
+                  {m.name}
+                </option>
               ))}
             </select>
 
-            <select value={projectId} onChange={(e) => { setProjectId(e.target.value); setPage(1); }} className="border border-slate-200 rounded-lg px-2.5 py-2 text-xs">
+            <select
+              value={projectId}
+              onChange={(e) => {
+                setProjectId(e.target.value);
+                setPage(1);
+              }}
+              className="border border-slate-200 rounded-lg px-2.5 py-2 text-xs"
+            >
               <option value="">All Projects</option>
               {projects.map((p) => (
-                <option key={p.id} value={p.id}>{p.name}</option>
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
               ))}
             </select>
 
-            <input type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); setPage(1); }} className="border border-slate-200 rounded-lg px-2.5 py-2 text-xs" />
-            <input type="date" value={dateTo} onChange={(e) => { setDateTo(e.target.value); setPage(1); }} className="border border-slate-200 rounded-lg px-2.5 py-2 text-xs" />
+            <input
+              type="date"
+              value={dateFrom}
+              onChange={(e) => {
+                setDateFrom(e.target.value);
+                setPage(1);
+              }}
+              className="border border-slate-200 rounded-lg px-2.5 py-2 text-xs"
+            />
+            <input
+              type="date"
+              value={dateTo}
+              onChange={(e) => {
+                setDateTo(e.target.value);
+                setPage(1);
+              }}
+              className="border border-slate-200 rounded-lg px-2.5 py-2 text-xs"
+            />
 
-            <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} className="border border-slate-200 rounded-lg px-2.5 py-2 text-xs">
+            <select
+              value={status}
+              onChange={(e) => {
+                setStatus(e.target.value);
+                setPage(1);
+              }}
+              className="border border-slate-200 rounded-lg px-2.5 py-2 text-xs"
+            >
               <option value="">All Statuses</option>
               <option value="draft">Draft</option>
               <option value="submitted">Submitted</option>
@@ -334,7 +416,10 @@ export default function Dashboard() {
           </div>
 
           {(userId || projectId || dateFrom || dateTo || status) && (
-            <button onClick={clearFilters} className="text-[11px] font-semibold text-orange-700 hover:underline mb-4">
+            <button
+              onClick={clearFilters}
+              className="text-[11px] font-semibold text-orange-700 hover:underline mb-4"
+            >
               Clear filters
             </button>
           )}
@@ -352,17 +437,37 @@ export default function Dashboard() {
               </thead>
               <tbody className="divide-y divide-slate-50 text-xs text-slate-700 font-medium">
                 {reports?.data.length === 0 && (
-                  <tr><td colSpan={5} className="py-6 text-center text-slate-400">No reports match these filters.</td></tr>
+                  <tr>
+                    <td colSpan={5} className="py-6 text-center text-slate-400">
+                      No reports match these filters.
+                    </td>
+                  </tr>
                 )}
                 {reports?.data.map((r) => (
-                  <tr key={r.id} className="hover:bg-slate-50/50">
-                    <td className="py-3.5 font-semibold text-slate-800">{r.user.name}</td>
-                    <td className="py-3.5 text-slate-500">{r.project?.name ?? "—"}</td>
-                    <td className="py-3.5 text-slate-500">{r.week_start} – {r.week_end}</td>
-                    <td className="py-3.5">
-                      <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-md ${statusColors[r.status]}`}>{r.status}</span>
+                  <tr
+                    key={r.id}
+                    className="hover:bg-slate-50/50"
+                    onClick={() => setSelectedReport(r)}
+                  >
+                    <td className="py-3.5 font-semibold text-slate-800">
+                      {r.user.name}
                     </td>
-                    <td className="py-3.5 text-right font-bold text-slate-800">{r.hours_worked ?? "—"}</td>
+                    <td className="py-3.5 text-slate-500">
+                      {r.project?.name ?? "—"}
+                    </td>
+                    <td className="py-3.5 text-slate-500">
+                      {r.week_start} – {r.week_end}
+                    </td>
+                    <td className="py-3.5">
+                      <span
+                        className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded-md ${statusColors[r.status]}`}
+                      >
+                        {r.status}
+                      </span>
+                    </td>
+                    <td className="py-3.5 text-right font-bold text-slate-800">
+                      {r.hours_worked ?? "—"}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -371,15 +476,85 @@ export default function Dashboard() {
 
           {reports && reports.last_page > 1 && (
             <div className="flex items-center justify-center gap-3 mt-5 text-xs">
-              <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="px-3 py-1.5 border border-slate-200 rounded-lg disabled:opacity-40">Previous</button>
-              <span className="text-slate-500">Page {reports.current_page} of {reports.last_page}</span>
-              <button disabled={page >= reports.last_page} onClick={() => setPage((p) => p + 1)} className="px-3 py-1.5 border border-slate-200 rounded-lg disabled:opacity-40">Next</button>
+              <button
+                disabled={page <= 1}
+                onClick={() => setPage((p) => p - 1)}
+                className="px-3 py-1.5 border border-slate-200 rounded-lg disabled:opacity-40"
+              >
+                Previous
+              </button>
+              <span className="text-slate-500">
+                Page {reports.current_page} of {reports.last_page}
+              </span>
+              <button
+                disabled={page >= reports.last_page}
+                onClick={() => setPage((p) => p + 1)}
+                className="px-3 py-1.5 border border-slate-200 rounded-lg disabled:opacity-40"
+              >
+                Next
+              </button>
             </div>
           )}
         </div>
 
-        {loading && <p className="text-xs text-slate-400 text-center">Loading dashboard…</p>}
+        {loading && (
+          <p className="text-xs text-slate-400 text-center">
+            Loading dashboard…
+          </p>
+        )}
       </main>
+
+      {selectedReport && (
+        <div
+          className="fixed inset-0 bg-slate-900/40 flex items-center justify-center z-50 p-4"
+          onClick={() => setSelectedReport(null)}
+        >
+          <div
+            className="bg-white rounded-3xl shadow-xl w-full max-w-lg p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-lg font-bold text-slate-900 mb-1">
+              {selectedReport.user.name}'s Report
+            </h2>
+            <p className="text-xs text-slate-400 mb-4">
+              {selectedReport.week_start} – {selectedReport.week_end} ·{" "}
+              {selectedReport.project?.name ?? "No project"}
+            </p>
+            <div className="space-y-3 text-sm">
+              <div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase">
+                  Tasks Completed
+                </p>
+                <p className="text-slate-700">
+                  {selectedReport.tasks_completed || "—"}
+                </p>
+              </div>
+              <div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase">
+                  Blockers
+                </p>
+                <p className="text-slate-700">
+                  {selectedReport.blockers || "None"}
+                </p>
+              </div>
+              <div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase">
+                  Hours
+                </p>
+                <p className="text-slate-700">
+                  {selectedReport.hours_worked ?? "—"}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setSelectedReport(null)}
+              className="mt-5 w-full py-2.5 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -393,7 +568,14 @@ interface StatCardProps {
   badgeColor?: string;
 }
 
-function StatCard({ title, value, icon: Icon, iconBg, badge, badgeColor }: StatCardProps) {
+function StatCard({
+  title,
+  value,
+  icon: Icon,
+  iconBg,
+  badge,
+  badgeColor,
+}: StatCardProps) {
   return (
     <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between min-h-30">
       <div className="flex justify-between items-start">
@@ -401,14 +583,20 @@ function StatCard({ title, value, icon: Icon, iconBg, badge, badgeColor }: StatC
           <Icon className="w-4 h-4" />
         </div>
         {badge && (
-          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${badgeColor || "bg-slate-100 text-slate-500"}`}>
+          <span
+            className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${badgeColor || "bg-slate-100 text-slate-500"}`}
+          >
             {badge}
           </span>
         )}
       </div>
       <div className="mt-4">
-        <p className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">{title}</p>
-        <p className="text-2xl font-bold text-slate-800 tracking-tight mt-0.5">{value}</p>
+        <p className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+          {title}
+        </p>
+        <p className="text-2xl font-bold text-slate-800 tracking-tight mt-0.5">
+          {value}
+        </p>
       </div>
     </div>
   );
