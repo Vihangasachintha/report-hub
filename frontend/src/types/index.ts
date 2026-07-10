@@ -66,6 +66,8 @@ export interface TeamReport {
   week_end: string;
   status: ReportStatus;
   hours_worked: number | null;
+  tasks_completed: string | null;
+  tasks_planned: string | null;
   blockers: string | null;
   user: { id: number; name: string; email: string };
   project: { id: number; name: string } | null;

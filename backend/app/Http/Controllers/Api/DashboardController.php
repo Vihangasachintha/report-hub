@@ -118,7 +118,7 @@ class DashboardController extends Controller
     public function trend(Request $request)
     {
         $weeks = Report::selectRaw('week_start, COUNT(*) as reports_count')
-            ->when($request->filled('user_id'), fn ($q) => $q->where('user_id', $request->user_id))
+            ->when($request->filled('user_id'), fn($q) => $q->where('user_id', $request->user_id))
             ->whereIn('status', ['submitted', 'late'])
             ->groupBy('week_start')
             ->orderBy('week_start')
@@ -152,5 +152,11 @@ class DashboardController extends Controller
             ->get(['id', 'user_id', 'project_id', 'week_start', 'week_end', 'status', 'submitted_at']);
 
         return response()->json($activity);
+    }
+
+    // 7. Reports details
+    public function reportDetail(Report $report)
+    {
+        return response()->json($report->load(['user:id,name,email', 'project:id,name']));
     }
 }

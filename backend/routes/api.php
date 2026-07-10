@@ -44,4 +44,5 @@ Route::middleware(['auth:api', 'role:manager'])->group(function () {
     Route::get('/team-members', [UserController::class, 'members']);
     Route::get('/projects/{project}/members', [ProjectController::class, 'members']);
     Route::post('/projects/{project}/members', [ProjectController::class, 'syncMembers']);
+    Route::get('/dashboard/reports/{report}', [DashboardController::class, 'reportDetail']);
 });

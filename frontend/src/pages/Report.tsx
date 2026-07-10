@@ -17,6 +17,11 @@ const statusColors: Record<string, string> = {
   late: "bg-red-50 text-red-600",
 };
 
+// Laravel returns dates as full ISO timestamps (e.g. "2026-06-29T00:00:00.000000Z"),
+// but <input type="date"> only accepts "YYYY-MM-DD" — this trims it safely.
+const toDateInputValue = (value: string | null | undefined) =>
+  value ? value.slice(0, 10) : "";
+
 export default function Report() {
   const navigate = useNavigate();
   const { id } = useParams(); // undefined = create mode, present = edit mode
@@ -27,7 +32,8 @@ export default function Report() {
   const [currentReport, setCurrentReport] = useState<ReportType | null>(null);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // for subtle in-page loading state
+  const [initialLoad, setInitialLoad] = useState(true); // only true on first mount
 
   const [formData, setFormData] = useState({
     week_start: "",
@@ -40,9 +46,13 @@ export default function Report() {
     notes: "",
   });
 
-  // Load projects + previous reports list, and the specific report if editing
+  // Load projects + previous reports list, and the specific report if editing.
+  // Runs again whenever `id` changes (navigating between reports), but no longer
+  // blanks out the whole page — only the first mount shows the full-page loader.
   useEffect(() => {
     setLoading(true);
+    setError("");
+
     Promise.all([
       api.get<Project[]>("/projects"),
       api.get<ReportType[]>("/reports"),
@@ -56,8 +66,8 @@ export default function Report() {
           const r = reportRes.data;
           setCurrentReport(r);
           setFormData({
-            week_start: r.week_start,
-            week_end: r.week_end,
+            week_start: toDateInputValue(r.week_start),
+            week_end: toDateInputValue(r.week_end),
             project_id: r.project_id ? String(r.project_id) : "",
             tasks_completed: r.tasks_completed ?? "",
             tasks_planned: r.tasks_planned ?? "",
@@ -65,10 +75,27 @@ export default function Report() {
             hours_worked: r.hours_worked !== null ? String(r.hours_worked) : "",
             notes: r.notes ?? "",
           });
+        } else {
+          // Create mode — reset form and currentReport in case we navigated
+          // here from an edit page (e.g. after delete)
+          setCurrentReport(null);
+          setFormData({
+            week_start: "",
+            week_end: "",
+            project_id: "",
+            tasks_completed: "",
+            tasks_planned: "",
+            blockers: "",
+            hours_worked: "",
+            notes: "",
+          });
         }
       })
       .catch(() => setError("Failed to load report data."))
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+        setInitialLoad(false);
+      });
   }, [id]);
 
   const buildPayload = () => ({
@@ -99,8 +126,7 @@ export default function Report() {
       if (isEditMode) {
         await api.put(`/reports/${id}`, buildPayload());
       } else {
-        const res = await api.post("/reports", buildPayload());
-        navigate(`/my-reports/report/${res.data.id}`, { replace: true });
+        await api.post("/reports", buildPayload());
       }
       navigate("/my-reports");
     } catch (err: any) {
@@ -152,7 +178,9 @@ export default function Report() {
 
   const isReadOnly = currentReport ? currentReport.status !== "draft" : false;
 
-  if (loading) {
+  // Only block the entire page on the very first load.
+  // Subsequent navigations between reports keep the layout mounted.
+  if (initialLoad) {
     return (
       <div className="flex-1 flex items-center justify-center text-sm text-slate-400">
         Loading report…
@@ -199,7 +227,7 @@ export default function Report() {
                     {previousReports.slice(0, 5).map((r) => (
                       <tr key={r.id} className="hover:bg-slate-50/30 transition-colors">
                         <td className="py-5 px-6 font-bold text-slate-800">
-                          {r.week_start} – {r.week_end}
+                          {toDateInputValue(r.week_start)} – {toDateInputValue(r.week_end)}
                         </td>
                         <td className="py-5 px-4 text-slate-600">
                           {r.project?.name ?? "—"}
@@ -255,6 +283,10 @@ export default function Report() {
               <FileSpreadsheet className="w-5 h-5" />
             </div>
           </div>
+
+          {loading && !initialLoad && (
+            <p className="text-xs text-slate-400">Refreshing…</p>
+          )}
 
           <form onSubmit={handleSubmitReport} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">

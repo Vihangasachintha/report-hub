@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Plus,
-  Pencil,
-  Trash2,
-  Eye,
-} from "lucide-react";
+import { Plus, Pencil, Trash2, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import type { Report } from "../types";
@@ -24,7 +19,9 @@ export default function MyReports() {
   const loadReports = () => {
     setLoading(true);
     api
-      .get<Report[]>("/reports", { params: statusFilter ? { status: statusFilter } : {} })
+      .get<Report[]>("/reports", {
+        params: statusFilter ? { status: statusFilter } : {},
+      })
       .then((res) => setReports(res.data))
       .finally(() => setLoading(false));
   };
@@ -33,12 +30,15 @@ export default function MyReports() {
     loadReports();
   }, [statusFilter]);
 
-  const submittedCount = reports.filter((r) => r.status === "submitted" || r.status === "late").length;
+  const submittedCount = reports.filter(
+    (r) => r.status === "submitted" || r.status === "late",
+  ).length;
   const draftCount = reports.filter((r) => r.status === "draft").length;
   const avgHours =
     reports.length > 0
       ? (
-          reports.reduce((sum, r) => sum + (r.hours_worked ?? 0), 0) / reports.length
+          reports.reduce((sum, r) => sum + (Number(r.hours_worked) || 0), 0) /
+          reports.length
         ).toFixed(1)
       : "0.0";
 
@@ -117,7 +117,10 @@ export default function MyReports() {
                   </tr>
                 )}
                 {reports.map((report) => (
-                  <tr key={report.id} className="hover:bg-slate-50/40 transition-colors">
+                  <tr
+                    key={report.id}
+                    className="hover:bg-slate-50/40 transition-colors"
+                  >
                     <td className="py-4">
                       <span className="font-bold text-slate-800 block">
                         {report.week_start} – {report.week_end}
@@ -127,7 +130,9 @@ export default function MyReports() {
                       {report.project?.name ?? "—"}
                     </td>
                     <td className="py-4">
-                      <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${statusColors[report.status]}`}>
+                      <span
+                        className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${statusColors[report.status]}`}
+                      >
                         {report.status}
                       </span>
                     </td>
@@ -138,7 +143,9 @@ export default function MyReports() {
                       {report.status === "draft" ? (
                         <div className="inline-flex items-center gap-3 text-orange-700/80">
                           <button
-                            onClick={() => navigate(`/my-reports/report/${report.id}`)}
+                            onClick={() =>
+                              navigate(`/my-reports/report/${report.id}`)
+                            }
                             className="hover:text-orange-900 p-1"
                           >
                             <Pencil className="w-4 h-4" />
@@ -152,7 +159,9 @@ export default function MyReports() {
                         </div>
                       ) : (
                         <button
-                          onClick={() => navigate(`/my-reports/report/${report.id}`)}
+                          onClick={() =>
+                            navigate(`/my-reports/report/${report.id}`)
+                          }
                           className="text-indigo-600 hover:text-indigo-900 p-1 inline-block"
                         >
                           <Eye className="w-4 h-4" />
@@ -166,7 +175,9 @@ export default function MyReports() {
           </div>
         </div>
 
-        {loading && <p className="text-xs text-slate-400 text-center">Loading…</p>}
+        {loading && (
+          <p className="text-xs text-slate-400 text-center">Loading…</p>
+        )}
       </main>
     </div>
   );
@@ -175,8 +186,12 @@ export default function MyReports() {
 function StatBox({ title, value }: { title: string; value: string | number }) {
   return (
     <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between min-h-30">
-      <p className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">{title}</p>
-      <p className="text-3xl font-bold text-slate-800 tracking-tight mt-1">{value}</p>
+      <p className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+        {title}
+      </p>
+      <p className="text-3xl font-bold text-slate-800 tracking-tight mt-1">
+        {value}
+      </p>
     </div>
   );
 }
