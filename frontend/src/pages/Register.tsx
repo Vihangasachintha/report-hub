@@ -59,13 +59,13 @@ export default function Register() {
 
   return (
     <div className="relative h-screen w-full overflow-hidden flex items-center justify-center p-4 antialiased font-sans">
-      <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-[#3d40c0] via-[#363bb8] to-[#3237b1]" />
+      <div className="absolute inset-x-0 top-0 h-1/2 bg-linear-to-b from-[#3d40c0] via-[#363bb8] to-[#3237b1]" />
       <div className="absolute inset-x-0 top-1/2 bottom-0 bg-[#efeff6]" />
 
-      <div className="relative z-10 w-full max-w-[1000px] bg-white rounded-[32px] flex flex-col md:flex-row overflow-hidden border border-slate-100">
-        <div className="w-full md:w-[42%] bg-[#2e3bb1] p-8 md:p-12 flex flex-col justify-between text-white relative min-h-[400px] md:min-h-[620px]">
+      <div className="relative z-10 w-full max-w-250 bg-white rounded-4xl flex flex-col md:flex-row overflow-hidden border border-slate-100">
+        <div className="w-full md:w-[42%] bg-[#2e3bb1] p-8 md:p-12 flex flex-col justify-between text-white relative min-h-100 md:min-h-155">
           <div className="flex items-center gap-2">
-            <div className="bg-white/15 p-2 rounded-xl backdrop-blur-sm">
+            <div className="bg-white/80 p-0 rounded-xl backdrop-blur-sm">
               <img src={ReportHubLogo} alt="ReportHub Logo" className="h-15 w-auto" />
             </div>
             <span className="font-bold text-2xl tracking-tight">ReportHub</span>
@@ -93,7 +93,7 @@ export default function Register() {
         </div>
 
         <div className="w-full md:w-[58%] p-8 md:p-12 flex flex-col justify-center">
-          <div className="max-w-[440px] w-full mx-auto">
+          <div className="max-w-110 w-full mx-auto">
             <h2 className="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">
               Create Your Account
             </h2>
